@@ -147,7 +147,8 @@ export function TimelineView() {
   }
 
   // Bar chart data: nodes per era
-  const barData = (eras ?? []).map((e) => ({
+  const safeEras = Array.isArray(eras) ? eras : []
+  const barData = safeEras.map((e) => ({
     name: e.name.split('/')[0].trim().replace('Pre-Hip-Hop ', ''),
     count: eraNodes[e.id]?.length ?? 0,
     color: e.color ?? '#888',
@@ -196,7 +197,7 @@ export function TimelineView() {
 
       {/* Era quick-nav */}
       <nav className="mb-8 flex flex-wrap gap-2" aria-label="Era navigation">
-        {(eras ?? []).map((e) => (
+        {safeEras.map((e) => (
           <a
             key={e.id}
             href={`#${e.id}`}
@@ -212,7 +213,7 @@ export function TimelineView() {
 
       {/* Era cards */}
       <div className="flex flex-col gap-6">
-        {(eras ?? []).map((era) => (
+        {safeEras.map((era) => (
           <EraCard key={era.id} era={era} nodes={eraNodes[era.id] ?? []} />
         ))}
       </div>

@@ -205,8 +205,8 @@ export function GraphExplorer() {
   }, [selectedNode, highlightIds])
 
   const graphData = {
-    nodes: (data?.nodes ?? []) as GraphNode[],
-    links: (data?.edges ?? []).map((e: GraphEdge) => ({
+    nodes: (Array.isArray(data?.nodes) ? data.nodes : []) as GraphNode[],
+    links: (Array.isArray(data?.edges) ? data.edges : []).map((e: GraphEdge) => ({
       source: typeof e.source === 'string' ? e.source : (e.source as GraphNode).id,
       target: typeof e.target === 'string' ? e.target : (e.target as GraphNode).id,
       relationship: e.relationship,

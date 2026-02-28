@@ -14,7 +14,8 @@ function getSQL(): NeonQueryFunction<false, false> {
 }
 
 export const sql: NeonQueryFunction<false, false> = new Proxy(
-  {} as NeonQueryFunction<false, false>,
+  // Must use a function as the proxy target so the `apply` trap actually works
+  (function () {}) as unknown as NeonQueryFunction<false, false>,
   {
     apply(_t, _this, args) {
       // eslint-disable-next-line prefer-spread
