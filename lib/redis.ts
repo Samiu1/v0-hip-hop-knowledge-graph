@@ -1,12 +1,24 @@
 import { Redis } from '@upstash/redis'
 
-if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
-  throw new Error('Upstash Redis environment variables are not set')
+// Lazily constructed so missing env vars don't crash at build time
+let _redis: Redis | null = null
+function getRedis(): Redis {
+  if (!_redis) {
+    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+      throw new Error('Upstash Redis environment variables KV_REST_API_URL and KV_REST_API_TOKEN must be set')
+    }
+    _redis = new Redis({
+      url: process.env.KV_REST_API_URL,
+      token: process.env.KV_REST_API_TOKEN,
+    })
+  }
+  return _redis
 }
 
-export const redis = new Redis({
-  url: process.env.KV_REST_API_URL!,
-  token: process.env.KV_REST_API_TOKEN!,
+export const redis = new Proxy({} as Redis, {
+  get(_target, prop) {
+    return (getRedis() as unknown as Record<string | symbol, unknown>)[prop]
+  },
 })
 
 // Cache TTLs (seconds)
