@@ -20,19 +20,18 @@ export async function GET(req: NextRequest) {
     })
   }
 
-  // Build node query
-  const eraFilter   = era  !== 'all' ? sql`AND era = ${era}`    : sql``
-  const typeFilter  = type !== 'all' ? sql`AND type = ${type}`  : sql``
+  // Build queries using plain conditional branching (neon tagged templates
+  // don't support composable SQL fragment interpolation)
+  const nodes =
+    era !== 'all' && type !== 'all'
+      ? await sql`SELECT id, name, type, era, year_start, year_end, region, description, influence_score, metadata FROM nodes WHERE era = ${era} AND type = ${type} ORDER BY influence_score DESC`
+      : era !== 'all'
+        ? await sql`SELECT id, name, type, era, year_start, year_end, region, description, influence_score, metadata FROM nodes WHERE era = ${era} ORDER BY influence_score DESC`
+        : type !== 'all'
+          ? await sql`SELECT id, name, type, era, year_start, year_end, region, description, influence_score, metadata FROM nodes WHERE type = ${type} ORDER BY influence_score DESC`
+          : await sql`SELECT id, name, type, era, year_start, year_end, region, description, influence_score, metadata FROM nodes ORDER BY influence_score DESC`
 
-  const nodes = await sql`
-    SELECT id, name, type, era, year_start, year_end, region,
-           description, influence_score, metadata
-    FROM   nodes
-    WHERE  1=1 ${eraFilter} ${typeFilter}
-    ORDER  BY influence_score DESC
-  `
-
-  const nodeIds = nodes.map((n) => n.id)
+  const nodeIds = nodes.map((n) => n.id as string)
 
   const edges = nodeIds.length > 0
     ? await sql`

@@ -6,14 +6,16 @@ import { Search, X, Filter, Info, ZoomIn, ZoomOut, Maximize2 } from 'lucide-reac
 import useSWR from 'swr'
 import { EraBadge } from '@/components/era-badge'
 import { NODE_COLORS, ERA_COLORS, RELATIONSHIP_LABELS, type GraphNode, type GraphEdge, type GraphData } from '@/lib/types'
-import { cn } from '@/lib/utils'
 
 // Dynamically import force graph (no SSR — needs window)
-const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false, loading: () => (
-  <div className="flex h-full items-center justify-center">
-    <div className="h-8 w-8 rounded-full border-2 border-gold border-t-transparent animate-spin" aria-label="Loading graph" />
-  </div>
-)})
+const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full items-center justify-center">
+      <div className="h-8 w-8 rounded-full border-2 border-gold border-t-transparent animate-spin" aria-label="Loading graph" />
+    </div>
+  ),
+})
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
@@ -122,7 +124,22 @@ export function GraphExplorer() {
   const [searchResults, setSearchResults] = useState<GraphNode[]>([])
   const [highlightIds, setHighlightIds] = useState<Set<string>>(new Set())
   const [showFilters, setShowFilters] = useState(false)
-  const graphRef = useRef<{ zoom: (n: number) => void; centerAt: (x: number, y: number, ms: number) => void } | null>(null)
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+  const canvasWrapRef = useRef<HTMLElement>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const graphRef = useRef<any>(null)
+
+  // Measure the canvas container so ForceGraph2D fills it exactly
+  useEffect(() => {
+    const el = canvasWrapRef.current
+    if (!el) return
+    const ro = new ResizeObserver((entries) => {
+      const { width, height } = entries[0].contentRect
+      setDimensions({ width, height })
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   const { data, isLoading } = useSWR<GraphData>(
     `/api/graph?era=${era}&type=${type}`,
@@ -311,7 +328,11 @@ export function GraphExplorer() {
       </aside>
 
       {/* Canvas area */}
-      <main className="relative flex-1 bg-background" aria-label="Force-directed graph canvas">
+      <main
+        ref={canvasWrapRef}
+        className="relative flex-1 bg-background overflow-hidden"
+        aria-label="Force-directed graph canvas"
+      >
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center z-10 bg-background/60 backdrop-blur-sm">
             <div className="flex flex-col items-center gap-3">
@@ -324,9 +345,9 @@ export function GraphExplorer() {
         {/* Zoom controls */}
         <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-1" role="group" aria-label="Zoom controls">
           {[
-            { icon: ZoomIn,    label: 'Zoom in',  onClick: () => graphRef.current?.zoom(1.5) },
-            { icon: ZoomOut,   label: 'Zoom out', onClick: () => graphRef.current?.zoom(0.7) },
-            { icon: Maximize2, label: 'Reset view', onClick: () => graphRef.current?.centerAt(0, 0, 500) },
+            { icon: ZoomIn,    label: 'Zoom in',    onClick: () => graphRef.current?.zoom(2, 400) },
+            { icon: ZoomOut,   label: 'Zoom out',   onClick: () => graphRef.current?.zoom(0.5, 400) },
+            { icon: Maximize2, label: 'Reset view',  onClick: () => graphRef.current?.zoomToFit(400) },
           ].map(({ icon: Icon, label, onClick }) => (
             <button
               key={label}
@@ -339,25 +360,31 @@ export function GraphExplorer() {
           ))}
         </div>
 
-        <ForceGraph2D
-          ref={graphRef as React.MutableRefObject<{ zoom: (n: number) => void; centerAt: (x: number, y: number, ms: number) => void } | null>}
-          graphData={graphData}
-          nodeCanvasObject={nodeCanvasObject}
-          nodeCanvasObjectMode={() => 'replace'}
-          linkColor={(link: { relationship?: string }) => {
-            const rel = link.relationship
-            if (rel === 'rivals') return 'rgba(224,92,42,0.6)'
-            if (rel === 'collaborated') return 'rgba(212,160,23,0.5)'
-            if (rel === 'influenced') return 'rgba(240,237,232,0.15)'
-            return 'rgba(240,237,232,0.1)'
-          }}
-          linkWidth={(link: { weight?: number }) => ((link.weight as number) ?? 0.5) * 1.5}
-          onNodeClick={handleNodeClick}
-          backgroundColor="#0A0A0A"
-          nodeLabel={(node: GraphNode) => `${node.name} (${node.type})`}
-          cooldownTicks={120}
-          warmupTicks={80}
-        />
+        {dimensions.width > 0 && dimensions.height > 0 && (
+          <ForceGraph2D
+            ref={graphRef}
+            width={dimensions.width}
+            height={dimensions.height}
+            graphData={graphData}
+            nodeCanvasObject={nodeCanvasObject}
+            nodeCanvasObjectMode={() => 'replace'}
+            linkColor={(link: { relationship?: string }) => {
+              const rel = link.relationship
+              if (rel === 'rivals') return 'rgba(224,92,42,0.6)'
+              if (rel === 'collaborated') return 'rgba(212,160,23,0.5)'
+              if (rel === 'influenced') return 'rgba(240,237,232,0.15)'
+              return 'rgba(240,237,232,0.1)'
+            }}
+            linkWidth={(link: { weight?: number }) => ((link.weight as number) ?? 0.5) * 1.5}
+            onNodeClick={handleNodeClick}
+            backgroundColor="#0A0A0A"
+            nodeLabel={(node: GraphNode) => `${node.name} (${node.type})`}
+            cooldownTicks={120}
+            warmupTicks={80}
+            enableZoomInteraction
+            enablePanInteraction
+          />
+        )}
       </main>
     </div>
   )
