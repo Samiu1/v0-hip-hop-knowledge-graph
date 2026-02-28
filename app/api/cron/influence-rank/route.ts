@@ -96,9 +96,11 @@ export async function GET(req: Request) {
       UPDATE cron_logs SET status = 'success',
              message = ${'PageRank done — ' + N + ' nodes, ' + ITERATIONS + ' iterations, ' + duration + 'ms'},
              duration_ms = ${duration}
-      WHERE  job_name = 'influence-rank'
-        AND  status = 'running'
-      ORDER  BY ran_at DESC LIMIT 1
+      WHERE  id = (
+        SELECT id FROM cron_logs
+        WHERE  job_name = 'influence-rank' AND status = 'running'
+        ORDER  BY ran_at DESC LIMIT 1
+      )
     `
 
     return NextResponse.json({ ok: true, nodes: N, duration_ms: duration })
@@ -108,9 +110,11 @@ export async function GET(req: Request) {
     await sql`
       UPDATE cron_logs SET status = 'error',
              message = ${message}, duration_ms = ${duration}
-      WHERE  job_name = 'influence-rank'
-        AND  status = 'running'
-      ORDER  BY ran_at DESC LIMIT 1
+      WHERE  id = (
+        SELECT id FROM cron_logs
+        WHERE  job_name = 'influence-rank' AND status = 'running'
+        ORDER  BY ran_at DESC LIMIT 1
+      )
     `
     return NextResponse.json({ ok: false, error: message }, { status: 500 })
   }

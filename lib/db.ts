@@ -1,27 +1,15 @@
-import { neon, type NeonQueryFunction } from '@neondatabase/serverless'
+import { neon } from '@neondatabase/serverless'
 
-// Lazily initialised so missing env var doesn't crash at build time
-let _sql: NeonQueryFunction<false, false> | null = null
+// Call this in every API route / server action to get the real neon client.
+// Lazily initialised so a missing DATABASE_URL doesn't crash at build time.
+let _client: ReturnType<typeof neon> | null = null
 
-function getSQL(): NeonQueryFunction<false, false> {
-  if (!_sql) {
+export function getDB(): ReturnType<typeof neon> {
+  if (!_client) {
     if (!process.env.DATABASE_URL) {
       throw new Error('DATABASE_URL environment variable is not set')
     }
-    _sql = neon(process.env.DATABASE_URL)
+    _client = neon(process.env.DATABASE_URL)
   }
-  return _sql
+  return _client
 }
-
-export const sql: NeonQueryFunction<false, false> = new Proxy(
-  {} as NeonQueryFunction<false, false>,
-  {
-    apply(_t, _this, args) {
-      // eslint-disable-next-line prefer-spread
-      return (getSQL() as unknown as (...a: unknown[]) => unknown).apply(_this, args)
-    },
-    get(_t, prop) {
-      return (getSQL() as unknown as Record<string | symbol, unknown>)[prop]
-    },
-  }
-)

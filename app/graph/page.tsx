@@ -11,7 +11,8 @@ export default function GraphPage() {
   return (
     <div className="flex h-screen flex-col bg-background overflow-hidden">
       <Nav />
-      <main className="flex-1 overflow-hidden" aria-label="Interactive knowledge graph">
+      {/* min-h-0 prevents flex children from overflowing their container */}
+      <main className="flex flex-1 min-h-0 overflow-hidden" aria-label="Interactive knowledge graph">
         <GraphExplorer />
       </main>
     </div>

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { sql } from '@/lib/db'
+import { getDB } from '@/lib/db'
 import { getCached, setCached, TTL } from '@/lib/redis'
 
 export const runtime = 'nodejs'
@@ -8,6 +8,8 @@ export async function GET() {
   const cacheKey = 'analytics:full'
   const cached = await getCached(cacheKey)
   if (cached) return NextResponse.json(cached, { headers: { 'X-Cache': 'HIT' } })
+
+  const sql = getDB()
 
   const [
     topInfluencers,
