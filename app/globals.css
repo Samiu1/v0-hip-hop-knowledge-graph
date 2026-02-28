@@ -3,80 +3,59 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── Hip-Hop Knowledge Graph — Design Tokens ── */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  --background: #0A0A0A;
+  --foreground: #F0EDE8;
+  --card: #111111;
+  --card-foreground: #F0EDE8;
+  --popover: #1A1A1A;
+  --popover-foreground: #F0EDE8;
+  --primary: #D4A017;
+  --primary-foreground: #0A0A0A;
+  --secondary: #1A1A1A;
+  --secondary-foreground: #F0EDE8;
+  --muted: #2A2A2A;
+  --muted-foreground: #888888;
+  --accent: #E05C2A;
+  --accent-foreground: #F0EDE8;
+  --destructive: #C0392B;
+  --destructive-foreground: #F0EDE8;
+  --border: #2A2A2A;
+  --input: #1A1A1A;
+  --ring: #D4A017;
+  /* Era chart colors */
+  --chart-1: #6B4C2A;
+  --chart-2: #C94F1A;
+  --chart-3: #D4A017;
+  --chart-4: #2A7D4F;
+  --chart-5: #1A4C8B;
+  --chart-6: #8B1A6B;
+  --chart-7: #1A7B8B;
+  --chart-8: #4A1A8B;
+  --chart-9: #8B4A1A;
+  --radius: 0.5rem;
+  --sidebar: #111111;
+  --sidebar-foreground: #F0EDE8;
+  --sidebar-primary: #D4A017;
+  --sidebar-primary-foreground: #0A0A0A;
+  --sidebar-accent: #1A1A1A;
+  --sidebar-accent-foreground: #F0EDE8;
+  --sidebar-border: #2A2A2A;
+  --sidebar-ring: #D4A017;
+  /* Brand extras */
+  --gold: #D4A017;
+  --gold-dim: #9B7312;
+  --brick: #E05C2A;
+  --jade: #2A7D4F;
+  --midnight: #1A4C8B;
+  --surface-raised: #1A1A1A;
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: 'Inter', 'Inter Fallback';
+  --font-display: 'Space Grotesk', 'Space Grotesk Fallback';
+  --font-mono: 'Space Mono', 'monospace';
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -101,10 +80,20 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --color-chart-6: var(--chart-6);
+  --color-chart-7: var(--chart-7);
+  --color-chart-8: var(--chart-8);
+  --color-chart-9: var(--chart-9);
+  --color-gold: var(--gold);
+  --color-gold-dim: var(--gold-dim);
+  --color-brick: var(--brick);
+  --color-jade: var(--jade);
+  --color-midnight: var(--midnight);
+  --color-surface-raised: var(--surface-raised);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 8px);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -119,7 +108,49 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    color-scheme: dark;
+  }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--card); }
+  ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
+}
+
+/* Era badge classes */
+.era-badge-roots      { background: #6B4C2A; color: #F0EDE8; }
+.era-badge-birth      { background: #C94F1A; color: #F0EDE8; }
+.era-badge-old_school { background: #D4A017; color: #0A0A0A; }
+.era-badge-golden     { background: #2A7D4F; color: #F0EDE8; }
+.era-badge-east_west  { background: #1A4C8B; color: #F0EDE8; }
+.era-badge-bling      { background: #8B1A6B; color: #F0EDE8; }
+.era-badge-internet   { background: #1A7B8B; color: #F0EDE8; }
+.era-badge-trap       { background: #4A1A8B; color: #F0EDE8; }
+.era-badge-modern     { background: #8B4A1A; color: #F0EDE8; }
+
+/* Graph node pulse */
+@keyframes pulse-gold {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.pulse-gold { animation: pulse-gold 2s ease-in-out infinite; }
+
+/* Line clamp */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
