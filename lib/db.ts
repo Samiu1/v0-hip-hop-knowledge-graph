@@ -1,9 +1,10 @@
-import { neon, type NeonQueryFunction } from '@neondatabase/serverless'
+import { neon } from '@neondatabase/serverless'
 
-// Lazily initialised so missing env var doesn't crash at build time
-let _sql: NeonQueryFunction<false, false> | null = null
+// Lazily initialised so the missing env var doesn't crash at build/import time.
+// We use a getter function and re-export sql as a direct reference after first call.
+let _sql: ReturnType<typeof neon> | null = null
 
-function getSQL(): NeonQueryFunction<false, false> {
+export function getSQL(): ReturnType<typeof neon> {
   if (!_sql) {
     if (!process.env.DATABASE_URL) {
       throw new Error('DATABASE_URL environment variable is not set')
@@ -13,14 +14,18 @@ function getSQL(): NeonQueryFunction<false, false> {
   return _sql
 }
 
-export const sql: NeonQueryFunction<false, false> = new Proxy(
-  {} as NeonQueryFunction<false, false>,
+// Tagged-template proxy: forwards every template-literal call to the real neon client.
+// Using a function (not an empty object) as the proxy target is required so the
+// `apply` trap fires for tagged-template invocations.
+export const sql = new Proxy(
+  function () {} as unknown as ReturnType<typeof neon>,
   {
-    apply(_t, _this, args) {
-      // eslint-disable-next-line prefer-spread
-      return (getSQL() as unknown as (...a: unknown[]) => unknown).apply(_this, args)
+    apply(_target, _thisArg, argArray) {
+      const fn = getSQL()
+      // argArray is [TemplateStringsArray, ...values] — spread it directly
+      return (fn as unknown as (...args: unknown[]) => unknown)(...argArray)
     },
-    get(_t, prop) {
+    get(_target, prop) {
       return (getSQL() as unknown as Record<string | symbol, unknown>)[prop]
     },
   }

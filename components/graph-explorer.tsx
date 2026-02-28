@@ -215,7 +215,7 @@ export function GraphExplorer() {
   }
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full w-full min-h-0">
       {/* Sidebar */}
       <aside className="flex w-72 shrink-0 flex-col border-r border-border bg-card overflow-y-auto" aria-label="Graph controls and node detail">
         {/* Search */}
