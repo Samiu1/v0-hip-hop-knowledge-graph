@@ -365,20 +365,20 @@ export function GraphExplorer() {
             ref={graphRef}
             width={dimensions.width}
             height={dimensions.height}
-            graphData={graphData}
-            nodeCanvasObject={nodeCanvasObject}
+            graphData={graphData as any}
+            nodeCanvasObject={nodeCanvasObject as any}
             nodeCanvasObjectMode={() => 'replace'}
-            linkColor={(link: { relationship?: string }) => {
+            linkColor={(link: any) => {
               const rel = link.relationship
               if (rel === 'rivals') return 'rgba(224,92,42,0.6)'
               if (rel === 'collaborated') return 'rgba(212,160,23,0.5)'
               if (rel === 'influenced') return 'rgba(240,237,232,0.15)'
               return 'rgba(240,237,232,0.1)'
             }}
-            linkWidth={(link: { weight?: number }) => ((link.weight as number) ?? 0.5) * 1.5}
-            onNodeClick={handleNodeClick}
+            linkWidth={(link: any) => ((link.weight as number) ?? 0.5) * 1.5}
+            onNodeClick={handleNodeClick as any}
             backgroundColor="#0A0A0A"
-            nodeLabel={(node: GraphNode) => `${node.name} (${node.type})`}
+            nodeLabel={(node: any) => `${node.name} (${node.type})`}
             cooldownTicks={120}
             warmupTicks={80}
             enableZoomInteraction
