@@ -5,7 +5,13 @@ let _redis: Redis | null = null
 function getRedis(): Redis {
   if (!_redis) {
     if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
-      throw new Error('Upstash Redis environment variables KV_REST_API_URL and KV_REST_API_TOKEN must be set')
+      console.warn('Upstash Redis environment variables are not set. Caching will be disabled.')
+      // Return a dummy object that allows the app to proceed without caching
+      return new Proxy({} as any, {
+        get() {
+          return () => Promise.resolve(null)
+        }
+      })
     }
     _redis = new Redis({
       url: process.env.KV_REST_API_URL,

@@ -9,15 +9,27 @@ export async function GET() {
   const cached = await getCached(cacheKey)
   if (cached) return NextResponse.json(cached, { headers: { 'X-Cache': 'HIT' } })
 
-  const eras = await sql`
-    SELECT e.id, e.name, e.year_start, e.year_end, e.description, e.color, e.key_events,
-           COUNT(n.id)::int AS node_count
-    FROM   eras e
-    LEFT   JOIN nodes n ON n.era = e.id
-    GROUP  BY e.id, e.name, e.year_start, e.year_end, e.description, e.color, e.key_events
-    ORDER  BY e.year_start ASC
-  `
+  try {
+    const eras = await sql`
+      SELECT e.id, e.name, e.year_start, e.year_end, e.description, e.color, e.key_events,
+             COUNT(n.id)::int AS node_count
+      FROM   eras e
+      LEFT   JOIN nodes n ON n.era = e.id
+      GROUP  BY e.id, e.name, e.year_start, e.year_end, e.description, e.color, e.key_events
+      ORDER  BY e.year_start ASC
+    `
 
-  await setCached(cacheKey, eras, TTL.ERAS)
-  return NextResponse.json(eras, { headers: { 'X-Cache': 'MISS' } })
+    await setCached(cacheKey, eras, TTL.ERAS)
+    return NextResponse.json(eras, { headers: { 'X-Cache': 'MISS' } })
+  } catch (error) {
+    console.error('Database error in /api/eras, falling back to mock data:', error)
+    const { MOCK_ERAS, MOCK_NODES } = await import('@/lib/mock-data')
+    
+    const eras = MOCK_ERAS.map(e => ({
+      ...e,
+      node_count: MOCK_NODES.filter(n => n.era === e.id).length
+    }))
+
+    return NextResponse.json(eras, { headers: { 'X-Cache': 'MOCK' } })
+  }
 }

@@ -6,7 +6,13 @@ let _sql: NeonQueryFunction<false, false> | null = null
 function getSQL(): NeonQueryFunction<false, false> {
   if (!_sql) {
     if (!process.env.DATABASE_URL) {
-      throw new Error('DATABASE_URL environment variable is not set')
+      console.warn('DATABASE_URL environment variable is not set. Data will be served from mock-data.ts.')
+      // Return a dummy object that throws on use, but allows the app to start
+      return new Proxy({}, {
+        get() {
+          throw new Error('DATABASE_URL is not set')
+        }
+      }) as any
     }
     _sql = neon(process.env.DATABASE_URL)
   }

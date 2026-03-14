@@ -12,18 +12,30 @@ export async function GET(req: NextRequest) {
   const cached = await getCached(cacheKey)
   if (cached) return NextResponse.json(cached, { headers: { 'X-Cache': 'HIT' } })
 
-  const results = await sql`
-    SELECT id, name, type, era, influence_score,
-           ts_rank(to_tsvector('english', name || ' ' || COALESCE(description, '')),
-                   plainto_tsquery('english', ${q})) AS rank
-    FROM   nodes
-    WHERE  to_tsvector('english', name || ' ' || COALESCE(description, ''))
-           @@ plainto_tsquery('english', ${q})
-        OR name ILIKE ${'%' + q + '%'}
-    ORDER  BY rank DESC, influence_score DESC
-    LIMIT  10
-  `
+  try {
+    const results = await sql`
+      SELECT id, name, type, era, influence_score,
+             ts_rank(to_tsvector('english', name || ' ' || COALESCE(description, '')),
+                     plainto_tsquery('english', ${q})) AS rank
+      FROM   nodes
+      WHERE  to_tsvector('english', name || ' ' || COALESCE(description, ''))
+             @@ plainto_tsquery('english', ${q})
+          OR name ILIKE ${'%' + q + '%'}
+      ORDER  BY rank DESC, influence_score DESC
+      LIMIT  10
+    `
 
-  await setCached(cacheKey, results, TTL.SEARCH)
-  return NextResponse.json(results, { headers: { 'X-Cache': 'MISS' } })
+    await setCached(cacheKey, results, TTL.SEARCH)
+    return NextResponse.json(results, { headers: { 'X-Cache': 'MISS' } })
+  } catch (error) {
+    console.error('Database error in /api/search, falling back to mock data:', error)
+    const { MOCK_NODES } = await import('@/lib/mock-data')
+    
+    const results = MOCK_NODES.filter(n => 
+      n.name.toLowerCase().includes(q.toLowerCase()) || 
+      n.description.toLowerCase().includes(q.toLowerCase())
+    ).slice(0, 10)
+
+    return NextResponse.json(results, { headers: { 'X-Cache': 'MOCK' } })
+  }
 }
